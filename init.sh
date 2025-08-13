@@ -1,5 +1,4 @@
 #!/bin/bash
-# filepath: ./init.sh
 
 # Update package list and install Docker if not present
 if ! command -v docker &> /dev/null
@@ -22,8 +21,8 @@ then
     sudo apt-get update
     sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
     sudo usermod -aG docker $USER
-    echo "Docker installed. Applying group changes with 'newgrp docker'..."
-    exec sg docker "$0" "$@"
+    echo "Docker installed. Applying group changes with 'sg docker'..."
+    exec sg docker "$(realpath "$0")" "$@"
     exit 0
 else
     echo "Docker is already installed."
