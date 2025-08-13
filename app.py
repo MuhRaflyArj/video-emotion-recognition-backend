@@ -9,8 +9,6 @@ from utils.video import decode_video, extract_facemesh, generate_video
 from models.downloader import download_model
 from models.predictor import predict_emotion
 
-
-
 app = Flask(__name__)
 app.config.from_object(Config)
 
@@ -183,3 +181,6 @@ def thumbnail():
         return jsonify({
             "error": f"Internal server error: {str(e)}"
         }), 500
+        
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port=5000)
