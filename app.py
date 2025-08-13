@@ -2,7 +2,7 @@ from flask import Flask, request, jsonify
 import time
 
 from config.config import Config
-from logutils.logger import extract_log_filters, get_logs, log_request
+from logutils.logger import get_logs, log_request
 from utils.validation import validate_payload
 from utils.video import decode_video, extract_facemesh
 from models.downloader import download_model
@@ -81,7 +81,7 @@ def predict():
     
     
 @app.route('/logs', methods=['GET'])
-def get_logs():
+def logs():
     start = time.perf_counter()
     
     try:
@@ -95,7 +95,7 @@ def get_logs():
                 "error": "Unauthorized"
             }), 401
         
-        filters = extract_log_filters(request)
+        filters = request.get_json()
         
         logs_data = get_logs(filters)
         

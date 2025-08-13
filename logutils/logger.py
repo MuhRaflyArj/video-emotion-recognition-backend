@@ -41,35 +41,12 @@ def log_request(status_code, latency_ms, success, prediction=None, confidence=No
         
     return log_entry
 
-def extract_log_filters(request):
-    filters = {}
-
-    if request.args.get('start_date'):
-        filters['start_date'] = request.args.get('start_date')
-
-    if request.args.get('end_date'):
-        filters['end_date'] = request.args.get('end_date')
-
-    if request.args.get('status_code'):
-        filters['status_code'] = request.args.get('status_code')
-
-    if request.args.get('endpoint'):
-        filters['endpoint'] = request.args.get('endpoint')
-
-    if request.args.get('success'):
-        filters['success'] = request.args.get('success')
-
-    if request.args.get('client_id'):
-        filters['client_id'] = request.args.get('client_id')
-
-    return filters
-
 def get_logs(filters={}):
     init_log_file()
     
     logs = []
     with open(LOG_FILE, mode='r', newline='') as f:
-        reader = csv.DictReader(f, fieldnames=LOG_FIELDS)
+        reader = csv.DictReader(f)
         for row in reader:
             include = True
             
