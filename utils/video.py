@@ -57,7 +57,7 @@ def extract_facemesh(video_bytes, container_format="mp4"):
     """
     
     
-    all_frames, err = extract_facemesh(video_bytes, container_format=container_format)
+    all_frames, err = extract_frames(video_bytes, container_format=container_format)
     if err:
         return None, err
 
