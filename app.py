@@ -1,8 +1,12 @@
 from flask import Flask, request, jsonify
+import time
+
 from config.config import Config
 from utils.validation import validate_payload
 from utils.video import decode_video, extract_facemesh
-import time
+from models.downloader import download_model
+from models.predictor import predict_emotion
+
 
 app = Flask(__name__)
 app.config.from_object(Config)
@@ -16,6 +20,10 @@ def predict():
     try: 
         header = dict(request.headers)
         payload = request.get_json()
+        
+        print(header)
+        
+        print(payload)
         
         valid_payload, error = validate_payload(header, payload)
         if not valid_payload:
@@ -36,12 +44,20 @@ def predict():
         arr, err = extract_facemesh(video_bytes, container_format=payload["format"])
         if err:
             return jsonify({"error": err}), 400
+        
+        model_path, err = download_model(model_filename="EmotiMesh_Net.pth")
+        if err:
+            return jsonify({"error": err}), 500
+        
+        pred_class = predict_emotion(arr, model_path=model_path)
 
-        # For demonstration, return the shape of the numpy array (not the array itself)
+        class_labels = ["Anger", "Happy", "Shock", "Neutral", "Sad"]
+        predicted_label = class_labels[pred_class] if 0 <= pred_class < len(class_labels) else "Unknown"
+
         return jsonify({
-            "facemesh_shape": list(arr.shape),
-            "facemesh_vectors": arr.tolist(),
+            "prediction": predicted_label,
             "latency_ms": int((time.perf_counter() - start) * 1000)
         }), 200
+        
     except Exception as e:
         return jsonify({"error": f"Internal server error: {str(e)}"}), 500

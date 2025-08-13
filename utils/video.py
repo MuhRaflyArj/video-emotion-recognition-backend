@@ -48,8 +48,7 @@ def extract_facemesh(video_bytes, container_format="mp4"):
         container.close()
         return None, f"Failed to decode video frames, {e}"
     
-    total_frames = len(all_frames)    
-    print(total_frames) # <-- Debug
+    total_frames = len(all_frames)
     
     if total_frames < 15:
         container.close()

@@ -57,3 +57,5 @@ instance/       # Folder for instance-specific config and data
 
 # Notebook files
 *.ipynb
+
+*.pth
