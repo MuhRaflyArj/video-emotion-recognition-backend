@@ -1,3 +1,6 @@
+from dotenv import load_dotenv
+load_dotenv()
+
 import base64
 from flask import Flask, request, jsonify
 import time

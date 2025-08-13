@@ -21,4 +21,4 @@ else
 fi
 
 sudo docker build -t expression-recognition-app .
-sudo docker run --env-file .env -p 5000:5000 expression-recognition-app
+sudo docker run -d --env-file .env -p 5000:5000 expression-recognition-app
