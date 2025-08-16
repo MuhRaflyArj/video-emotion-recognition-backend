@@ -107,20 +107,131 @@ The API will be accessible at:
 
 ## 📦 Endpoints
 
-- `POST /predict`  
-  Upload a base64-encoded video and receive the predicted emotion and confidence.
+### `POST /predict`
 
-- `POST /thumbnail`  
-  Upload a video and receive a generated "boomerang" thumbnail video (base64-encoded).
+**Description:**  
+Upload a base64-encoded video and receive the predicted emotion and confidence.
 
-- `GET /logs`  
-  Retrieve logs of previous API requests (requires authentication).
+**Headers:**
+- `x-api-key`: Your API key
+- `date`: Current date and time in ISO 8601 format (e.g., `2025-08-16T12:34:56Z`)
+
+**Payload Example:**
+```json
+{
+  "encoding": "base64",
+  "format": "mp4",
+  "fps": 30,
+  "content": "<base64 string>"
+}
+```
+
+**Response Example:**
+```json
+{
+  "emotion": "Happy",
+  "confidence": 0.92
+}
+```
+
+---
+
+### `POST /thumbnail`
+
+**Description:**  
+Upload a base64-encoded video and receive a generated "boomerang" thumbnail video (base64-encoded).
+
+**Headers:**
+- `x-api-key`: Your API key
+- `date`: Current date and time in ISO 8601 format (e.g., `2025-08-16T12:34:56Z`)
+
+**Payload Example:**
+```json
+{
+  "encoding": "base64",
+  "format": "mp4",
+  "fps": 30,
+  "content": "<base64 string>"
+}
+```
+
+**Response Example:**
+```json
+{
+  "thumbnail": "<base64 string>"
+}
+```
+
+---
+
+### `GET /logs`
+
+**Description:**  
+Retrieve logs of previous API requests. Requires authentication.  
+Supports filtering by various parameters via JSON body in the request.
+
+**Headers:**
+- `x-api-key`: Your API key
+- `date`: Current date and time in ISO 8601 format (e.g., `2025-08-16T12:34:56Z`)
+
+**Filtering Options (send as JSON body):**
+- `start_date`: (string, ISO format) Filter logs from this date/time.
+- `end_date`: (string, ISO format) Filter logs up to this date/time.
+- `status_code`: (string or int) Filter by HTTP status code (e.g., `"200"`).
+- `success`: (string `"True"` or `"False"`) Filter by request success.
+- `client_id`: (string) Filter by client ID.
+
+**Examples:**
+
+- **All logs:**
+  ```json
+  {}
+  ```
+
+- **By date range:**
+  ```json
+  {
+    "start_date": "2025-08-13T00:00:00",
+    "end_date": "2025-08-13T23:59:59"
+  }
+  ```
+
+- **By status code:**
+  ```json
+  {
+    "status_code": "200"
+  }
+  ```
+
+- **By success:**
+  ```json
+  {
+    "success": "True"
+  }
+  ```
+
+- **By client ID:**
+  ```json
+  {
+    "client_id": "your_client_id_here"
+  }
+  ```
+
+- **Combined filters:**
+  ```json
+  {
+    "start_date": "2025-08-13T00:00:00",
+    "end_date": "2025-08-13T23:59:59",
+    "success": "False",
+    "client_id": "your_client_id_here"
+  }
+  ```
 
 ---
 
 ## 📚 Model
 
-The backend uses the [`EmotiMesh_Net`](models/predictor.py) model, trained to recognize emotions from 3D facial landmarks extracted by MediaPipe.
+The backend uses the [`EmotiMesh_Net`](models/predictor.py) model, trained on AFEW-VA dataset to recognize emotions from 3D facial landmarks extracted by MediaPipe.
 
 > **Model Training:**  
 > You can train or fine-tune the model yourself using the [video-based-emotion-recognition](https://github.com/MuhRaflyArj/video-based-emotion-recognition) repository (also maintained by the author of this backend).  
