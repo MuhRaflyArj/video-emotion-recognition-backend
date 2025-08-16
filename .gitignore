@@ -60,3 +60,4 @@ instance/       # Folder for instance-specific config and data
 
 *.pth
 *.csv
+.env
