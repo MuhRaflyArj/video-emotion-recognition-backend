@@ -8,7 +8,7 @@ import time
 from config.config import Config
 from logutils.logger import get_logs, log_request
 from utils.validation import validate_payload
-from utils.video import decode_video, extract_facemesh, generate_video
+from utils.video import decode_video, extract_face_images, generate_video
 from models.downloader import download_model
 from models.predictor import predict_emotion
 
@@ -45,24 +45,24 @@ def predict():
             log_request(400, latency_ms, False, error_message="Missing or invalid video content")
             return jsonify({"error": "Missing or invalid video content"}), 400
 
-        # Extract face vectors from video
-        arr, err = extract_facemesh(video_bytes, container_format=payload["format"])
+        # Extract face image sequence from video
+        image_sequence, err = extract_face_images(video_bytes, container_format=payload["format"])
         if err:
             latency_ms = int((time.perf_counter() - start) * 1000)
             log_request(400, latency_ms, False, error_message=err)
             return jsonify({"error": err}), 400
         
         # Download model if the model not exist
-        model_path, err = download_model(model_filename="EmotiMesh_Net.pth")
+        model_path, err = download_model(model_filename="EfficientNetV2S.pth")
         if err:
             latency_ms = int((time.perf_counter() - start) * 1000)
             log_request(500, latency_ms, False, error_message=err)
             return jsonify({"error": err}), 500
         
-        # Predict the emotion based on facemesh vectors
-        pred_class, confidence = predict_emotion(arr, model_path=model_path)
+        # Predict the emotion based on face images
+        pred_class, confidence = predict_emotion(image_sequence, model_path=model_path)
 
-        class_labels = ["Anger", "Happy", "Shock", "Neutral", "Sad"]
+        class_labels = ["Anger", "Happy", "Neutral", "Sad", "Shock"]
         predicted_label = class_labels[pred_class] if 0 <= pred_class < len(class_labels) else "Unknown"
 
         latency_ms = int((time.perf_counter() - start) * 1000)
@@ -186,4 +186,4 @@ def thumbnail():
         }), 500
         
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000)
+    app.run(host="0.0.0.0", port=5001)

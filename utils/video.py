@@ -106,6 +106,78 @@ def extract_facemesh(video_bytes, container_format="mp4"):
 
     return np.asarray(rows, dtype=np.float32), None
 
+def get_face_bbox(frame_shape, landmarks, margin=0.1):
+    """Calculate bounding box from landmarks with a margin."""
+    h, w, _ = frame_shape
+    x_coords = [lm.x * w for lm in landmarks]
+    y_coords = [lm.y * h for lm in landmarks]
+    
+    x_min, x_max = min(x_coords), max(x_coords)
+    y_min, y_max = min(y_coords), max(y_coords)
+    
+    x_margin = (x_max - x_min) * margin
+    y_margin = (y_max - y_min) * margin
+    
+    x_min = int(max(0, x_min - x_margin))
+    x_max = int(min(w, x_max + x_margin))
+    y_min = int(max(0, y_min - y_margin))
+    y_max = int(min(h, y_max + y_margin))
+    
+    return x_min, y_min, x_max, y_max
+
+def extract_face_images(video_bytes, container_format="mp4", num_images=18, face_img_size=(224, 224)):
+    """
+    Extracts a sequence of face images from a video for model prediction.
+    """
+    all_frames, err = extract_frames(video_bytes, container_format=container_format)
+    if err:
+        return None, err
+
+    total_frames = len(all_frames)
+    if total_frames < 15:
+        return None, "Video must have at least 15 frames"
+
+    indices = np.linspace(0, total_frames - 1, num=num_images, dtype=int)
+    
+    image_sequence = []
+    last_known_image = np.zeros(face_img_size, dtype=np.uint8)
+    
+    mp_face_mesh = mp.solutions.face_mesh
+    
+    try:
+        with mp_face_mesh.FaceMesh(
+            static_image_mode=False,
+            max_num_faces=1,
+            refine_landmarks=False,
+            min_detection_confidence=0.35,
+            min_tracking_confidence=0.35
+        ) as face_mesh:
+            
+            for idx in indices:
+                frame = all_frames[idx]
+                rgb_frame = frame.to_ndarray(format='rgb24')
+                result = face_mesh.process(rgb_frame)
+                
+                if result.multi_face_landmarks:
+                    face_landmarks = result.multi_face_landmarks[0]
+                    x_min, y_min, x_max, y_max = get_face_bbox(rgb_frame.shape, face_landmarks.landmark)
+                    face_crop = rgb_frame[y_min:y_max, x_min:x_max]
+                    
+                    if face_crop.size > 0:
+                        gray_face = cv2.cvtColor(face_crop, cv2.COLOR_BGR2GRAY)
+                        resized_face = cv2.resize(gray_face, face_img_size, interpolation=cv2.INTER_AREA)
+                        last_known_image = resized_face
+                        image_sequence.append(last_known_image)
+                    else:
+                        image_sequence.append(last_known_image)
+                else:
+                    image_sequence.append(last_known_image)
+
+    except Exception as e:
+        return None, f"Failed to extract face images: {e}"
+
+    return np.array(image_sequence, dtype=np.float32), None
+
 def generate_video(video_bytes, container_format='mp4', target_fps=10, target_duration=3.0):
     """
     Create a boomerang effect from video
