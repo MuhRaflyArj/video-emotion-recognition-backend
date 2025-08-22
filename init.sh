@@ -29,4 +29,4 @@ else
 fi
 
 docker build -t expression-recognition-app .
-docker run -d --env-file .env -p 5000:5000 expression-recognition-app
+docker run -d --env-file .env -p 5001:5001 expression-recognition-app
