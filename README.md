@@ -53,7 +53,7 @@ This backend service provides an API for generating expressive video thumbnails 
 
 The following steps have been tested on **Debian 12 (Bookworm)** running on Google Cloud Platform (GCP) with an **e2-standard-2** VM and **25GB disk**.
 
-**The API will be available on port `5000`.**
+**The API will be available on port `5001`.**
 
 ### 1. Install Git and Docker
 
@@ -101,7 +101,7 @@ chmod +x init.sh
 ```
 
 The API will be accessible at:  
-`http://<external-server-ip>:5000`
+`http://<external-server-ip>:5001`
 
 ---
 
