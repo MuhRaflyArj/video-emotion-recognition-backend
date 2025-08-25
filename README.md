@@ -67,6 +67,7 @@ sudo apt-get install -y git docker.io
 ```sh
 git clone https://github.com/MuhRaflyArj/video-emotion-recognition-backend.git
 cd video-emotion-recognition-backend
+git checkout video
 ```
 
 ### 3. Prepare Environment Variables
