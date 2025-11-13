@@ -47,13 +47,13 @@ def predict_emotion(image_sequence, model_path, device='cpu'):
     model.eval()
 
     with torch.no_grad():
-        # Normalize and prepare tensor
-        image_tensor = torch.tensor(image_sequence, dtype=torch.float32) / 255.0
-        input_tensor = image_tensor.unsqueeze(0).to(device) # Add batch dimension
+        inputs = torch.from_numpy(image_sequence).float()
+        
+        if inputs.ndim == 5 and inputs.shape[1] == 1:
+            inputs = inputs.squeeze(1)
+            
+        logits = model(inputs.to(device))
+        probs = torch.softmax(logits, dim=1)
+        confidence, pred_class = torch.max(probs, dim=1)
 
-        output = model(input_tensor)
-        probability = torch.softmax(output, dim=1)
-
-        confidence, predicted_class = torch.max(probability, dim=1)
-
-    return predicted_class.item(), confidence.item()
+    return pred_class.item(), confidence.item()

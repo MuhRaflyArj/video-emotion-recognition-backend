@@ -10,6 +10,7 @@ def download_model(model_dir="models", model_filename="model.pth"):
     try:
         model_path = os.path.join(model_dir, model_filename)
         download_id = current_app.config.get("MODEL_DOWNLOAD_ID")
+        print(f"MODEL DOWNLOAD ID: {download_id}")
 
         if not download_id:
             return None, "MODEL ID is invalid"
