@@ -138,7 +138,7 @@ def thumbnail():
         if upload_err:
             latency_ms = int((time.perf_counter() - start) * 1000)
             log_request(502, latency_ms, False, error_message=upload_err)
-            return jsonify({"error": "Failed to store thumbnail"}), 502
+            return jsonify({"error": f"Failed to store thumbnail, {upload_err}"}), 502
 
         public_uri = f"https://storage.googleapis.com/{bucket_name}/{gcs_object_path}"
         latency_ms = int((time.perf_counter() - start) * 1000)
@@ -190,4 +190,4 @@ def logs():
         }), 500
         
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000)
+    app.run(host="0.0.0.0", port=5003)

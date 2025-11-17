@@ -28,5 +28,5 @@ else
     echo "Docker is already installed."
 fi
 
-docker build -t expression-recognition-app .
-docker run -d --env-file .env -p 5001:5001 expression-recognition-app
+docker build -t expression-recognition-app-dev .
+docker run -d --env-file .env -p 5003:5003 expression-recognition-app-dev

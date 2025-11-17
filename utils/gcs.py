@@ -35,7 +35,7 @@ def upload_gcs_bytes(bucket_name, blob_name, data, timeout=None, content_type="v
         blob = client.bucket(bucket_name).blob(blob_name)
         blob.cache_control = "public, max-age=3600"
         blob.upload_from_file(io.BytesIO(data), timeout=timeout, content_type=content_type, rewind=True)
-        blob.make_public()
+        # blob.make_public()
         return None
     except gcloud_exceptions.GoogleAPIError as exc:
         return f"Google Cloud Storage upload error: {exc}"
